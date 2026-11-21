@@ -70,32 +70,41 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from rosenbrock_sources import comparisons  # noqa: E402
 
 out.append("\n## First published sources\n")
-out.append("Each card compares the library copies with the method's first published source, transcribed in 50-digit "
-           "arithmetic in `scripts/rosenbrock_sources.py`. *Difference* is the largest absolute difference over alpha, "
-           "Gamma and b (and, separately, the embedded weights).\n")
+out.append("Each card compares the library copies with the method's first published source (a paper, or the author's "
+           "own code), transcribed in 50-digit arithmetic in `scripts/rosenbrock_sources.py`, where every coefficient "
+           "has its page or line. Each transcription is checked against something else the source prints before it is "
+           "used. Library copies are found by their coefficients (equal to 1e-8), whatever the library calls them. "
+           "*Difference* is the largest absolute difference over alpha, Gamma and b (and, separately, the embedded "
+           "weights).\n")
 for src, copies in comparisons():
     dm = max(c["diff"] for c in copies)
     de = [c["embedded_diff"] for c in copies if c["embedded_diff"] is not None]
     out.append(f"### {src['name']}\n")
     out.append(f"- **Reference:** {src['reference']}")
-    out.append(f"- **How compared:** {src['how']} Transcription against the printed table: {src['printed_check']:.1e}.")
+    out.append(f"- **How compared:** {src['how']}")
+    out.append(f"- **Check of the transcription:** {src['check_label']}: {src['printed_check']:.1e}.")
     out.append(f"- **Library copies ({len(copies)}):** "
                + "; ".join(f"[{c['library']}]({c['url']}) `{c['method']}` (difference {c['diff']:.1e}"
                            + (f", embedded {c['embedded_diff']:.1e}" if c["embedded_diff"] is not None
-                              else ", no embedded weights stored") + ")" for c in copies))
-    out.append(f"- **Result:** all {len(copies)} copies agree with the paper to {dm:.1e}"
+                              else "") + ")" for c in copies))
+    out.append(f"- **Result:** all {len(copies)} copies agree with the source to {dm:.1e}"
                + (f"; the {len(de)} copies with embedded weights agree to {max(de):.1e}." if de else "."))
-    out.append("- **Stage times and time-derivative weights:** the paper gives alpha_i = ("
-               + ", ".join(mpmath.nstr(x, 6) for x in src["times"]) + ") and gamma_i = ("
-               + ", ".join(mpmath.nstr(x, 6) for x in src["time_weights"])
-               + "), and its printed table agrees. They are not stored with the library tables (the autonomous form), "
-               "so they are not compared here.\n")
+    if src.get("time_weights"):
+        out.append("- **Stage times and time-derivative weights:** the source gives alpha_i = ("
+                   + ", ".join(mpmath.nstr(x, 6) for x in src["times"]) + ") and gamma_i = ("
+                   + ", ".join(mpmath.nstr(x, 6) for x in src["time_weights"])
+                   + "). They are not stored with the library tables (the autonomous form), so they are not compared "
+                   "with the libraries here.\n")
+    else:
+        out.append("- **Stage times:** alpha_i = (" + ", ".join(mpmath.nstr(x, 6) for x in src["times"])
+                   + "). The source uses the autonomous form and gives no time-derivative weights.\n")
     fmt = lambda v: mpmath.nstr(v, 17)  # noqa: E731
     lines = [f"gamma_ii = {fmt(src['gamma'][0][0])}",
              "alpha = [" + "; ".join(", ".join(fmt(x) for x in r) for r in src["alpha"]) + "]",
              "Gamma = [" + "; ".join(", ".join(fmt(x) for x in r) for r in src["gamma"]) + "]",
-             "b = [" + ", ".join(fmt(x) for x in src["b"]) + "]",
-             "b_embedded = [" + ", ".join(fmt(x) for x in src["embedded"]) + "]"]
-    out.append("Coefficients (standard form, from the paper's closed form):\n\n```text\n" + "\n".join(lines) + "\n```\n")
+             "b = [" + ", ".join(fmt(x) for x in src["b"]) + "]"]
+    if src.get("embedded") is not None:
+        lines.append("b_embedded = [" + ", ".join(fmt(x) for x in src["embedded"]) + "]")
+    out.append("Coefficients (standard form, from the source, 17 digits):\n\n```text\n" + "\n".join(lines) + "\n```\n")
 (ROOT / "ROSENBROCK.md").write_text("\n".join(out) + "\n", encoding="utf-8", newline="\n")
 print(f"wrote ROSENBROCK.md: {len(rows)} tables, {len(groups)} groups")

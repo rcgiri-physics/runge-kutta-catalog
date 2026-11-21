@@ -77,17 +77,18 @@ Order 6+ means the conditions hold through order 6, the highest checked.
 
 ## First published sources
 
-Each card compares the library copies with the method's first published source, transcribed in 50-digit arithmetic in `scripts/rosenbrock_sources.py`. *Difference* is the largest absolute difference over alpha, Gamma and b (and, separately, the embedded weights).
+Each card compares the library copies with the method's first published source (a paper, or the author's own code), transcribed in 50-digit arithmetic in `scripts/rosenbrock_sources.py`, where every coefficient has its page or line. Each transcription is checked against something else the source prints before it is used. Library copies are found by their coefficients (equal to 1e-8), whatever the library calls them. *Difference* is the largest absolute difference over alpha, Gamma and b (and, separately, the embedded weights).
 
 ### ROS3P
 
 - **Reference:** J. Lang and J. Verwer, ROS3P - an accurate third-order Rosenbrock solver designed for parabolic problems, *BIT* 41 (2001) 731-738, [doi:10.1023/A:1021900219772](https://doi.org/10.1023/A:1021900219772); [CWI copy](https://ir.cwi.nl/pub/1102/1102D.pdf)
-- **How compared:** The closed form of Sect. 5 (gamma = 1/2 + sqrt(3)/6, alpha21 = alpha31 = 1, alpha32 = 0, gamma21 = -1, gamma31 = -gamma, gamma32 = 1/2 - 2 gamma, b = (2/3, 0, 1/3), b-hat = (1/3, 1/3, 1/3)), in 50-digit arithmetic. The transcription was first checked against the paper's own Table 5.1 (transformed form, 16 digits). Transcription against the printed table: 4.1e-16.
-- **Library copies (4):** [OrdinaryDiffEq.jl](https://github.com/SciML/OrdinaryDiffEq.jl/blob/535e41fa0db0f651d5792962f0599d08d3e5d158/lib/OrdinaryDiffEqRosenbrockTableaus/src/rosenbrock_tableaus.jl) `ROS3P` (difference 3.2e-16, embedded 5.7e-16); [MESA](https://github.com/MESAHub/mesa/blob/32fef8c8eb7aa4484222585928625b3d5d46bbd8/num/private/mod_rosenbrock.f) `ros3p` (difference 3.0e-16, embedded 3.1e-16); [EarthSciIntegrator](https://github.com/EarthSciML/EarthSciIntegrator/blob/99d5977103a92934e0e4e523acd665bb0517ceb2/spec/tableaus/ROS3P.json) `ROS3P` (difference 3.2e-16, embedded 5.7e-16); [Deneb](https://github.com/HojunYouKr/Deneb/blob/d35406a6eb7d30f4619696fe298e26415771b15f/source/Deneb/src/deneb_timescheme_rosenbrock.cpp) `ROS3P` (difference 3.3e-16, no embedded weights stored)
-- **Result:** all 4 copies agree with the paper to 3.3e-16; the 3 copies with embedded weights agree to 5.7e-16.
-- **Stage times and time-derivative weights:** the paper gives alpha_i = (0, 1, 1) and gamma_i = (0.788675, -0.211325, -1.07735), and its printed table agrees. They are not stored with the library tables (the autonomous form), so they are not compared here.
+- **How compared:** The closed form of Sect. 5 (gamma = 1/2 + sqrt(3)/6, alpha21 = alpha31 = 1, alpha32 = 0, gamma21 = -1, gamma31 = -gamma, gamma32 = 1/2 - 2 gamma, b = (2/3, 0, 1/3), b-hat = (1/3, 1/3, 1/3)), in 50-digit arithmetic. The transcription was first checked against the paper's own Table 5.1 (transformed form, 16 digits).
+- **Check of the transcription:** the transcription against the paper's Table 5.1: 4.1e-16.
+- **Library copies (4):** [OrdinaryDiffEq.jl](https://github.com/SciML/OrdinaryDiffEq.jl/blob/535e41fa0db0f651d5792962f0599d08d3e5d158/lib/OrdinaryDiffEqRosenbrockTableaus/src/rosenbrock_tableaus.jl) `ROS3P` (difference 3.2e-16, embedded 5.7e-16); [MESA](https://github.com/MESAHub/mesa/blob/32fef8c8eb7aa4484222585928625b3d5d46bbd8/num/private/mod_rosenbrock.f) `ros3p` (difference 3.0e-16, embedded 3.1e-16); [EarthSciIntegrator](https://github.com/EarthSciML/EarthSciIntegrator/blob/99d5977103a92934e0e4e523acd665bb0517ceb2/spec/tableaus/ROS3P.json) `ROS3P` (difference 3.2e-16, embedded 5.7e-16); [Deneb](https://github.com/HojunYouKr/Deneb/blob/d35406a6eb7d30f4619696fe298e26415771b15f/source/Deneb/src/deneb_timescheme_rosenbrock.cpp) `ROS3P` (difference 3.3e-16)
+- **Result:** all 4 copies agree with the source to 3.3e-16; the 3 copies with embedded weights agree to 5.7e-16.
+- **Stage times and time-derivative weights:** the source gives alpha_i = (0, 1, 1) and gamma_i = (0.788675, -0.211325, -1.07735). They are not stored with the library tables (the autonomous form), so they are not compared with the libraries here.
 
-Coefficients (standard form, from the paper's closed form):
+Coefficients (standard form, from the source, 17 digits):
 
 ```text
 gamma_ii = 0.78867513459481288
@@ -95,5 +96,42 @@ alpha = [0, 0, 0; 1, 0, 0; 1, 0, 0]
 Gamma = [0.78867513459481288, 0, 0; -1, 0.78867513459481288, 0; -0.78867513459481288, -1.0773502691896258, 0.78867513459481288]
 b = [0.66666666666666667, 0, 0.33333333333333333]
 b_embedded = [0.33333333333333333, 0.33333333333333333, 0.33333333333333333]
+```
+
+### RODAS (Hairer and Wanner)
+
+- **Reference:** E. Hairer's own code `rodas.f`, subroutine ROCOE, METH = 1 ([archived copy of www.unige.ch/~hairer/prog/stiff/rodas.f, 2026-03-17](https://web.archive.org/web/20260317131158/https://www.unige.ch/~hairer/prog/stiff/rodas.f)); the method is described in E. Hairer and G. Wanner, *Solving Ordinary Differential Equations II*, 2nd ed. (Springer, 1996), Sects. IV.7 and VI.3 (as the code's header says)
+- **How compared:** The 16-digit coefficients of ROCOE METH = 1 (transformed form with gamma = 0.25; the method is stiffly accurate, so b is row 6 of A and the embedded weights row 5), converted to the standard form in 50-digit arithmetic. ROCOE in the archived author's file is identical, line for line, to the copy shipped with Assimulo.
+- **Check of the transcription:** the file's own stage times (C2, C3, C4) and time-derivative weights (D1 to D4) against the row sums of alpha and Gamma: 9.1e-16.
+- **Library copies (7):** [OrdinaryDiffEq.jl](https://github.com/SciML/OrdinaryDiffEq.jl/blob/535e41fa0db0f651d5792962f0599d08d3e5d158/lib/OrdinaryDiffEqRosenbrockTableaus/src/rosenbrock_tableaus.jl) `Rodas4` (difference 3.6e-14, embedded 1.1e-14); [Hairer RODAS (Assimulo copy of rodas_decsol.f)](https://github.com/modelon-community/Assimulo/blob/74045c69fab4132ea4ebdbff9d9d29268999e3ed/thirdparty/hairer/rodas_decsol.f) `RODAS (METH 1)` (difference 3.6e-14, embedded 1.1e-14); [KPP](https://github.com/KineticPreProcessor/KPP/blob/fd1c2cd87fa0c07abea82d568155719c2569405f/int/rosenbrock.f90) `Rodas4` (difference 3.6e-14, embedded 1.1e-14); [NCAR MICM](https://github.com/NCAR/micm/blob/ba2e8e6d17d386d81ffc7908660493f855f70911/include/micm/solver/rosenbrock_solver_parameters.hpp) `SixStageDifferentialAlgebraicRosenbrockParameters` (difference 3.6e-14, embedded 1.1e-14); [MESA](https://github.com/MESAHub/mesa/blob/32fef8c8eb7aa4484222585928625b3d5d46bbd8/num/private/mod_rosenbrock.f) `rodas4` (difference 3.6e-14, embedded 1.1e-14); [EarthSciIntegrator](https://github.com/EarthSciML/EarthSciIntegrator/blob/99d5977103a92934e0e4e523acd665bb0517ceb2/spec/tableaus/Rodas4.json) `Rodas4` (difference 3.6e-14, embedded 1.1e-14); [OpenFOAM-dev](https://github.com/OpenFOAM/OpenFOAM-dev/tree/fed424ace4164a7685a5035d43fff7ba03f76a0e/src/ODE/ODESolvers/rodas34) `rodas34` (difference 3.6e-14, embedded 1.1e-14)
+- **Result:** all 7 copies agree with the source to 3.6e-14; the 7 copies with embedded weights agree to 1.1e-14.
+- **Stage times and time-derivative weights:** the source gives alpha_i = (0.0, 0.386, 0.21, 0.63, 1.0, 1.0) and gamma_i = (0.25, -0.1043, 0.1035, -0.0362, 0.0, 0.0). They are not stored with the library tables (the autonomous form), so they are not compared with the libraries here.
+
+Coefficients (standard form, from the source, 17 digits):
+
+```text
+gamma_ii = 0.25
+alpha = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0; 0.386, 0.0, 0.0, 0.0, 0.0, 0.0; 0.1460747075254179, 0.0639252924745821, 0.0, 0.0, 0.0, 0.0; -0.33081150366773011, 0.71115102516828476, 0.24966047849944542, 0.0, 0.0, 0.0; -4.552557186318031, 1.7101813632413319, 4.0143473321031723, -0.17197150902647375, 0.0, 0.0; 2.4286337654669878, -0.38274873376478461, -1.8557203309295804, 0.55983529922737625, 0.25, 0.0]
+Gamma = [0.25, 0.0, 0.0, 0.0, 0.0, 0.0; -0.3543, 0.25, 0.0, 0.0, 0.0, 0.0; -0.13360250526817555, -0.012897494731824469, 0.25, 0.0, 0.0, 0.0; 1.5268491730064671, -0.53365628875045728, -1.27939288425601, 0.25, 0.0, 0.0; 6.9811909517850188, -2.0929300970061166, -5.8700676630327527, 0.73180680825385, 0.25, 0.0; -2.0801894941809363, 0.59576235567668331, 1.7016177982672619, -0.088514519835880427, -0.37867613992712837, 0.25]
+b = [0.34844427128605153, 0.2130136219118987, -0.15410253266231846, 0.47132077939149582, -0.12867613992712837, 0.25]
+b_embedded = [2.4286337654669878, -0.38274873376478461, -1.8557203309295804, 0.55983529922737625, 0.25, 0.0]
+```
+
+### ROS2
+
+- **Reference:** J. G. Verwer, E. J. Spee, J. G. Blom and W. Hundsdorfer, A second-order Rosenbrock method applied to photochemical dispersion problems, *SIAM J. Sci. Comput.* 20 (1999) 1456-1480, [doi:10.1137/S1064827597326651](https://doi.org/10.1137/S1064827597326651); [CWI copy](https://ir.cwi.nl/pub/1252/1252D.pdf)
+- **How compared:** The two-stage family of eq. (3.2) with b2 = 1/2 and gamma = 1 + 1/sqrt(2) (pp. 1460-1461): b = (1/2, 1/2), alpha21 = 1/(2 b2) = 1, gamma21 = -gamma/b2 = -2 gamma, in 50-digit arithmetic. The paper notes the method is second order for any matrix in place of the Jacobian (a W-method). It defines no embedded weights, so only the main coefficients are compared.
+- **Check of the transcription:** the paper's stability function (3.3) against the transcription: 2.1e-50.
+- **Library copies (8):** [OrdinaryDiffEq.jl](https://github.com/SciML/OrdinaryDiffEq.jl/blob/535e41fa0db0f651d5792962f0599d08d3e5d158/lib/OrdinaryDiffEqRosenbrockTableaus/src/rosenbrock_tableaus.jl) `ROS2` (difference 2.2e-16); [PETSc TS](https://github.com/petsc/petsc/blob/370304ebe4989feffd3fafa6f04bf08222cedf87/src/ts/impls/rosw/rosw.c) `TSROSW2P` (difference 1.3e-16); [KPP](https://github.com/KineticPreProcessor/KPP/blob/fd1c2cd87fa0c07abea82d568155719c2569405f/int/rosenbrock.f90) `Ros2` (difference 1.3e-16); [NCAR MICM](https://github.com/NCAR/micm/blob/ba2e8e6d17d386d81ffc7908660493f855f70911/include/micm/solver/rosenbrock_solver_parameters.hpp) `TwoStageRosenbrockParameters` (difference 1.3e-16); [MESA](https://github.com/MESAHub/mesa/blob/32fef8c8eb7aa4484222585928625b3d5d46bbd8/num/private/mod_rosenbrock.f) `ros2` (difference 1.3e-16); [EarthSciIntegrator](https://github.com/EarthSciML/EarthSciIntegrator/blob/99d5977103a92934e0e4e523acd665bb0517ceb2/spec/tableaus/ROS2.json) `ROS2` (difference 1.3e-16); [PyFR](https://github.com/PyFR/PyFR/blob/6dd3180e4af57a8ba69566dce501c2465d611fc7/pyfr/integrators/implicit/steppers.py) `ros2` (difference 1.3e-16); [OpenFOAM-dev](https://github.com/OpenFOAM/OpenFOAM-dev/tree/fed424ace4164a7685a5035d43fff7ba03f76a0e/src/ODE/ODESolvers/Rosenbrock12) `Rosenbrock12` (difference 1.3e-16)
+- **Result:** all 8 copies agree with the source to 2.2e-16.
+- **Stage times:** alpha_i = (0.0, 1.0). The source uses the autonomous form and gives no time-derivative weights.
+
+Coefficients (standard form, from the source, 17 digits):
+
+```text
+gamma_ii = 1.7071067811865475
+alpha = [0.0, 0.0; 1.0, 0.0]
+Gamma = [1.7071067811865475, 0.0; -3.414213562373095, 1.7071067811865475]
+b = [0.5, 0.5]
 ```
 
