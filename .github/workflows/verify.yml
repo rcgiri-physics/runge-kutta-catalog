@@ -19,10 +19,13 @@ jobs:
         run: python scripts/verify.py
       - name: Tables up to 13 stages, 50 digits
         run: python scripts/verify.py --precise --max-stages 13
+      - name: Rosenbrock tables
+        run: python scripts/verify_rosenbrock.py
       - name: Generated pages are up to date
         run: |
           python scripts/render.py
           python scripts/render_start.py
+          python scripts/render_rosenbrock.py
           git diff --exit-code
       - name: Example
         run: python examples/convergence.py

@@ -24,7 +24,8 @@ Tables are grouped into a method when A, b, c and the embedded weights agree to 
 ## What is not covered
 
 - Only the tables, not the code that applies them. A correct table can be used by a step function with a bug (for example, a stage evaluated at the wrong time). Some of those cases were checked separately in the census and are on the [physverify census page](https://rcgiri-physics.github.io/physverify/census/).
-- Dense output, Rosenbrock, IMEX coupling, symplectic and multistep coefficients are not in this dataset yet.
+- Rosenbrock tables are included for 10 libraries (`data/rosenbrock.jsonl`). They were collected by running the census's own reader for each library with physverify's Rosenbrock checker wrapped, so no coefficient was typed by hand; only each library's own tables were kept (not the perturbed tables the census used for experiments), and every order was recomputed with physverify 0.9.0. Their coefficients are stored as double-precision numbers in the standard (alpha, Gamma, b) form, converted from the library's own form where needed, not as the printed strings.
+- Dense output, IMEX coupling, symplectic and multistep coefficients are not in this dataset yet.
 - A few sources could not be obtained (paywalled or offline), so those methods have no first-source check.
 
 ## Rebuilding

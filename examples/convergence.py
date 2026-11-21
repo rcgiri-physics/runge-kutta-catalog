@@ -48,6 +48,7 @@ def solve_linear(A, b, c, a, g, t_end, n):
 
 start = json.load(open(ROOT / "data/start_here.json", encoding="utf-8"))  # written by scripts/render_start.py
 
+failures = []
 print("1. y' = y cos t, y(0) = 1, exact y(2) = exp(sin 2)")
 for card in start:
     A, b, c = table(card["table_id"])
@@ -55,6 +56,8 @@ for card in start:
     errs = [abs(solve_linear(A, b, c, np.cos, None, 2.0, n) - np.exp(np.sin(2.0))) for n in ns]
     res = check_order([2.0 / n for n in ns], errs, expected=card["order"])
     print(f"   {card['name']:<24} {res.status:<5} {res.message}")
+    if res.status != "PASS":
+        failures.append(card["name"])
 
 print("\n2. y' = t, y(0) = 0, exact y(1) = 1/2, with the archived Feagin 12 table (c2 = 2)")
 fid = next(t["id"] for t in TABLES.values() if t["library"] == "OrdinaryDiffEq.jl" and t["method"] == "Feagin12"
@@ -64,3 +67,12 @@ zero = lambda ts: np.zeros_like(ts)  # noqa: E731
 for label, cc in (("as archived, c2 = 2  ", c), ("corrected, c2 = 0.2  ", np.where(np.isclose(c, 2.0), 0.2, c))):
     errs = [abs(solve_linear(A, b, cc, zero, lambda ts: ts, 1.0, n) - 0.5) for n in (4, 8, 16)]
     print(f"   {label} errors at 4, 8, 16 steps: " + ", ".join(f"{e:.1e}" for e in errs))
+    if label.startswith("as archived") and not all(errs[i + 1] > 0 and 1.8 < errs[i] / errs[i + 1] < 2.2
+                                                   for i in range(2)):
+        failures.append("Feagin 12 as archived: expected first order (the defect), did not see it")
+    if label.startswith("corrected") and max(errs) > 1e-13:
+        failures.append("Feagin 12 corrected: expected round-off error")
+
+if failures:
+    sys.exit("unexpected results: " + "; ".join(failures))
+print("\nall results as expected (the first-order Feagin 12 result is the archived defect, shown on purpose)")
