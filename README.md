@@ -1,5 +1,7 @@
 # runge-kutta-catalog
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24412889.svg)](https://doi.org/10.5281/zenodo.24412889) [![verify](https://github.com/rcgiri-physics/runge-kutta-catalog/actions/workflows/verify.yml/badge.svg)](https://github.com/rcgiri-physics/runge-kutta-catalog/actions/workflows/verify.yml)
+
 **Runge–Kutta Butcher tableaux with original sources, order checks, and errata.**
 
 Runge–Kutta coefficients are copied by hand from papers into code, and from code into more code. One wrong digit can lower a method's order without any visible sign: adaptive step control shrinks the step until the error looks fine, and a test on y′ = λy cannot see a wrong stage time. This catalogue shows where each table came from, how the library copies differ, and what was checked.
@@ -65,6 +67,6 @@ The census also covered IMEX coupling, dense output, symplectic splitting and li
 
 ## Citing and licence
 
-Cite as in [CITATION.cff](CITATION.cff); a Zenodo DOI will be added with the first public release. The data (`data/` and the generated pages) is under [CC BY 4.0](LICENSE-DATA), the scripts under the [MIT licence](LICENSE). Coefficients are as published by the libraries and their sources; each table records where it was read.
+Cite as in [CITATION.cff](CITATION.cff): [doi:10.5281/zenodo.24412889](https://doi.org/10.5281/zenodo.24412889) for all versions, or the DOI of the version you used (0.1.0: [doi:10.5281/zenodo.24412890](https://doi.org/10.5281/zenodo.24412890)). The data (`data/` and the generated pages) is under [CC BY 4.0](LICENSE-DATA), the scripts under the [MIT licence](LICENSE). Coefficients are as published by the libraries and their sources; each table records where it was read.
 
 Corrections are welcome: if a table, a name or a reference here is wrong, please open an issue.

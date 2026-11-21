@@ -9,6 +9,14 @@ authors:
 version: 0.1.0
 date-released: 2026-11-21
 license: CC-BY-4.0
+doi: 10.5281/zenodo.24412889
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.24412889
+    description: Concept DOI, all versions (Zenodo)
+  - type: doi
+    value: 10.5281/zenodo.24412890
+    description: Version 0.1.0 (Zenodo)
 repository-code: https://github.com/rcgiri-physics/runge-kutta-catalog
 abstract: >-
   823 Butcher tables read from 34 open-source ODE libraries at pinned versions,
