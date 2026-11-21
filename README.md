@@ -12,7 +12,7 @@ Runge–Kutta coefficients are copied by hand from papers into code, and from co
 - **[SOURCES.md](SOURCES.md):** the 40 methods compared with their first published source. Each card gives the reference with a DOI or archived link, how the comparison was made, how many library copies agree and how closely, and the tableau.
 - **[ERRATA.md](ERRATA.md):** errors found in published sources and in libraries, and failures that are not defects.
 - **[CATALOGUE.md](CATALOGUE.md):** every table, grouped by coefficients, with its order, stage order and the libraries that carry it.
-- **[ROSENBROCK.md](ROSENBROCK.md):** 88 Rosenbrock and W-method tables from 10 libraries, with the order for the exact Jacobian, the order as a W-method (any approximate Jacobian), the embedded order, R(inf) and A-stability.
+- **[ROSENBROCK.md](ROSENBROCK.md):** 88 Rosenbrock and W-method tables from 10 libraries, with the order for the exact Jacobian, the order as a W-method (any approximate Jacobian), the embedded order, R(inf) and A-stability, each linked to its source file at a pinned commit.
 - **[examples/convergence.py](examples/convergence.py):** runs the five start-here methods on y′ = y cos t, and shows a confirmed library defect (Feagin 12 with c₂ = 2) turning a 12th-order method into a first-order one on y′ = t.
 
 ## The counts, and how they relate
@@ -52,12 +52,12 @@ python examples/convergence.py
 | `data/tables.jsonl` | one line per table: library, version, file, line, coefficients as printed and exact, the library's claim, the verdict, 50-digit residuals, NodePy's order, first-source comparison |
 | `data/methods.jsonl` | one line per coefficient group: display name, all names used, order, coefficients, libraries, references |
 | `data/summary.json` | the counts above |
-| `data/rosenbrock.jsonl` | one line per Rosenbrock table: library, version, file, alpha, Gamma, b, embedded weights, orders, R(inf), A-stability margin |
+| `data/rosenbrock.jsonl` | one line per Rosenbrock table: library, commit and link to the source file, alpha, Gamma, b, embedded weights, orders, R(inf), A-stability margin |
 | `scripts/` | `verify.py`, `verify_rosenbrock.py`, the page generators (`render.py`, `render_sources.py`, `render_start.py`, `render_rosenbrock.py`) and the SciPy example |
 
 ## Rosenbrock and W-methods
 
-`data/rosenbrock.jsonl` holds 88 Rosenbrock tables from OrdinaryDiffEq.jl, Hairer's RODAS, PETSc, KPP, NCAR MICM, MESA, EarthSciIntegrator, Deneb, PyFR and OpenFOAM, in the standard (alpha, Gamma, b) form. `python scripts/verify_rosenbrock.py` recomputes the order with the exact Jacobian, the order as a W-method and the embedded order. Not yet included: tables from libraries with reported but unconfirmed defects, first-source comparisons for Rosenbrock methods, and dense output.
+`data/rosenbrock.jsonl` holds 88 Rosenbrock tables from OrdinaryDiffEq.jl, Hairer's RODAS, PETSc, KPP, NCAR MICM, MESA, EarthSciIntegrator, Deneb, PyFR and OpenFOAM, in the standard (alpha, Gamma, b) form. Each record links to the library file at the commit read. `python scripts/verify_rosenbrock.py` recomputes the order with the exact Jacobian, the order as a W-method and the embedded order: all 88 reproduce, and all 37 order claims stored with a table are met. Not yet included: tables from libraries with reported but unconfirmed defects, first-source comparisons for Rosenbrock methods, and dense output.
 
 ## Other families
 

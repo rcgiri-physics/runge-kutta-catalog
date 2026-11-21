@@ -14,11 +14,16 @@ abstract: >-
   823 Butcher tables read from 34 open-source ODE libraries at pinned versions,
   checked against the order conditions with physverify and to 50 digits, with a
   NodePy second opinion, and comparisons of 40 methods with their first
-  published sources. Includes errata for published sources and confirmed library
-  defects, and a script that re-checks every table.
+  published sources; and 88 Rosenbrock and W-method tables from 10 libraries,
+  each linked to its source at a pinned commit, with the order for the exact
+  Jacobian, the order as a W-method and the embedded order. Includes errata for
+  published sources and confirmed library defects, and scripts that re-check
+  every table.
 keywords:
   - Runge-Kutta
   - Butcher tableau
+  - Rosenbrock methods
+  - W-methods
   - order conditions
   - ODE solvers
   - code verification
