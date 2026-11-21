@@ -21,6 +21,8 @@ jobs:
         run: python scripts/verify.py --precise --max-stages 13
       - name: Rosenbrock tables
         run: python scripts/verify_rosenbrock.py
+      - name: Rosenbrock first sources
+        run: python scripts/rosenbrock_sources.py
       - name: Generated pages are up to date
         run: |
           python scripts/render.py

@@ -57,7 +57,7 @@ python examples/convergence.py
 
 ## Rosenbrock and W-methods
 
-`data/rosenbrock.jsonl` holds 88 Rosenbrock tables from OrdinaryDiffEq.jl, Hairer's RODAS, PETSc, KPP, NCAR MICM, MESA, EarthSciIntegrator, Deneb, PyFR and OpenFOAM, in the standard (alpha, Gamma, b) form. Each record links to the library file at the commit read. `python scripts/verify_rosenbrock.py` recomputes the order with the exact Jacobian, the order as a W-method and the embedded order: all 88 reproduce, and all 37 order claims stored with a table are met. Not yet included: tables from libraries with reported but unconfirmed defects, first-source comparisons for Rosenbrock methods, and dense output.
+`data/rosenbrock.jsonl` holds 88 Rosenbrock tables from OrdinaryDiffEq.jl, Hairer's RODAS, PETSc, KPP, NCAR MICM, MESA, EarthSciIntegrator, Deneb, PyFR and OpenFOAM, in the standard (alpha, Gamma, b) form. Each record links to the library file at the commit read. `python scripts/verify_rosenbrock.py` recomputes the order with the exact Jacobian, the order as a W-method and the embedded order: all 88 reproduce, and all 37 order claims stored with a table are met. ROS3P is compared with its first published source (Lang and Verwer 2001): all four library copies agree with the paper to 3.3e-16 (`scripts/rosenbrock_sources.py`). Not yet included: tables from libraries with reported but unconfirmed defects, first-source comparisons for the other Rosenbrock methods, and dense output.
 
 ## Other families
 
