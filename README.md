@@ -1,46 +1,56 @@
-# rk-tables — Runge–Kutta tables from open-source ODE libraries, checked
+# runge-kutta-catalog
 
-Runge–Kutta coefficients are copied by hand from papers into code, and from code into more code. One wrong digit can lower a method's order without any visible sign: adaptive step control shrinks the step until the error looks fine, and a test on y′ = λy cannot see a wrong stage time.
+**Runge–Kutta Butcher tableaux with original sources, order checks, and errata.**
 
-This repository holds **823 Butcher tables read from 34 open-source libraries** at pinned versions, each checked against the order conditions, and grouped into **362 methods**. Use it to:
+Runge–Kutta coefficients are copied by hand from papers into code, and from code into more code. One wrong digit can lower a method's order without any visible sign: adaptive step control shrinks the step until the error looks fine, and a test on y′ = λy cannot see a wrong stage time. This catalogue shows where each table came from, how the library copies differ, and what was checked.
 
-- **find the coefficients of a method** with their verified order, stage order and the libraries that carry them ([CATALOGUE.md](CATALOGUE.md));
-- **see which methods were compared with their first published source** (paper, author's file or construction from the definition) and how closely the library copies agree ([SOURCES.md](SOURCES.md));
-- **check a table you have** against the order conditions with [physverify](https://github.com/rcgiri-physics/physverify) (`physverify.butcher.check_tableau`), or compare it with the copies here;
-- **read the errors found**, in published sources and in libraries ([ERRATA.md](ERRATA.md)).
+**823 tableaux from 34 open-source libraries**, each read at a pinned version and checked against the order conditions. 40 methods were compared with their first published source.
 
-## What is here
+## Where to start
 
-| File | Content |
+- **[START_HERE.md](START_HERE.md):** five widely used methods (classical RK4, Dormand–Prince 5(4), Tsitouras 5(4), SSPRK(3,3), Radau IIA) with a copyable tableau, the original reference and when you would use each.
+- **[SOURCES.md](SOURCES.md):** the 40 methods compared with their first published source. Each card gives the reference with a DOI or archived link, how the comparison was made, how many library copies agree and how closely, and the tableau.
+- **[ERRATA.md](ERRATA.md):** errors found in published sources and in libraries, and failures that are not defects.
+- **[CATALOGUE.md](CATALOGUE.md):** every table, grouped by coefficients, with its order, stage order and the libraries that carry it.
+- **[examples/convergence.py](examples/convergence.py):** runs the five start-here methods on y′ = y cos t, and shows a confirmed library defect (Feagin 12 with c₂ = 2) turning a 12th-order method into a first-order one on y′ = t.
+
+## The counts, and how they relate
+
+| | Count |
 |---|---|
-| [CATALOGUE.md](CATALOGUE.md) | every method: name, stages, order, stage order, what it was checked against, which libraries carry it |
-| [SOURCES.md](SOURCES.md) | 40 methods compared with their first published source, with the largest difference over all library copies |
-| [ERRATA.md](ERRATA.md) | errors in published sources, defects confirmed by library maintainers, and failures that are not defects |
-| [METHOD.md](METHOD.md) | how the tables were read and checked, and what was not covered |
-| `data/tables.jsonl` | one line per library table: library, version, file, line, coefficients as printed and in exact form, the library's claim, the verdict, 50-digit residuals, the NodePy second opinion and the first-source comparison |
-| `data/methods.jsonl` | one line per method: names, order, coefficients, libraries, references |
-| `data/summary.json` | the counts |
-| `scripts/verify.py` | re-checks every table with physverify: `pip install physverify mpmath`, then `python scripts/verify.py` |
+| Tables read from the libraries | 847 |
+| Held back: defects reported but not yet confirmed by the maintainers | 24 (in 10 libraries) |
+| **Tables published here** | **823** |
+| Coefficient groups (tables whose A, b, c and embedded weights agree to 12 significant digits) | 362 |
+| Distinct method names among them | 319 |
+| Methods compared with their first published source | 40 |
+| Tables with a NodePy second opinion (all agree) | 680 |
 
-## Results in brief (counts for these libraries only)
+The same method can fall into several groups: a float copy and an exact copy differ beyond 12 digits, and some libraries add an embedded pair or an extra stage. The group count is therefore not a count of distinct methods. Of the 847 tables read, 791 satisfy the order their library states, 39 do not, 16 state no order and 1 is truncated in the code. Each failure was reviewed by hand; more than half are defects, the rest are by design, approximate by construction or open (see [ERRATA.md](ERRATA.md)). Held-back tables are added once the maintainers confirm.
 
-- Of the 847 tables read, 791 satisfy the order their library states, 39 do not, 16 state no order and 1 is truncated in the code.
-- Each failure was reviewed by hand against its source, with an exact recheck and, where possible, a convergence run. More than half are defects; the others are by design (for example Lobatto IIIB, whose stage times differ from the row sums on purpose), approximate by construction, or open.
-- 24 defect rows from 10 libraries are not published here yet: their maintainers have not confirmed them. They are counted above and will be added as replies arrive.
-- Most defects show only when f depends on t, or only in the error estimate. **If you test an integrator, include a problem with explicit time dependence**, such as y′ = y cos t.
-- NodePy recomputed the order of the 680 tables that passed by 2026-11-16 and agreed on all 680.
+Most defects show only when f depends on t, or only in the error estimate. **If you test an integrator, include a problem with explicit time dependence**, such as y′ = y cos t.
 
 These counts describe this sample of libraries, chosen by availability. They are not an error rate for numerical software.
 
-## Reproducing the checks
+## Checking it yourself
 
 ```bash
-pip install physverify mpmath
-python scripts/verify.py
-# 823 reproduced, 0 not reproduced, 0 skipped (no order recorded) of 823 tables
+pip install -r requirements.txt     # physverify, mpmath, numpy, pinned
+python scripts/verify.py            # every table, double precision
+python scripts/verify.py --precise --max-stages 13   # 50-digit residuals against the archive
+python examples/convergence.py
 ```
 
-For each table the script evaluates the coefficients as printed in the library, confirms the recorded order with `physverify.butcher.check_tableau`, and checks that the library's own claim gives the recorded verdict.
+`verify.py` evaluates each table from the strings printed in the library and checks, with `physverify.butcher.check_tableau`, that the recorded order holds, that the next order fails (below order 14, the highest checked), and that the library's own claim gives the recorded verdict. `--precise` recomputes the order-condition residuals over every rooted tree in 50-digit arithmetic and compares them with the archive. [scripts/example_source_to_record.py](scripts/example_source_to_record.py) shows how one record was made, reading SciPy's RK45 from the installed library. Reading the other 33 libraries and the comparisons with first sources were done in the census and are recorded per table, not re-run here. CI runs all of this on every push and weekly. Details: [METHOD.md](METHOD.md).
+
+## Files
+
+| File | Content |
+|---|---|
+| `data/tables.jsonl` | one line per table: library, version, file, line, coefficients as printed and exact, the library's claim, the verdict, 50-digit residuals, NodePy's order, first-source comparison |
+| `data/methods.jsonl` | one line per coefficient group: display name, all names used, order, coefficients, libraries, references |
+| `data/summary.json` | the counts above |
+| `scripts/` | `verify.py`, the page generators (`render.py`, `render_sources.py`, `render_start.py`) and the SciPy example |
 
 ## Other families
 
@@ -48,6 +58,6 @@ The same census covered Rosenbrock and W-methods, IMEX coupling, dense output, s
 
 ## Citing and licence
 
-Cite as in [CITATION.cff](CITATION.cff). The data (`data/`, and the generated Markdown files) is under [CC BY 4.0](LICENSE-DATA); the scripts are under the [MIT licence](LICENSE). Coefficients are as published by the libraries and their sources; each table records where it was read.
+Cite as in [CITATION.cff](CITATION.cff); a Zenodo DOI will be added with the first public release. The data (`data/` and the generated pages) is under [CC BY 4.0](LICENSE-DATA), the scripts under the [MIT licence](LICENSE). Coefficients are as published by the libraries and their sources; each table records where it was read.
 
 Corrections are welcome: if a table, a name or a reference here is wrong, please open an issue.

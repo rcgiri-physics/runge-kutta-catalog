@@ -1,0 +1,28 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"  # weekly, so a new physverify or NumPy release cannot break it unnoticed
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Every table, double precision
+        run: python scripts/verify.py
+      - name: Tables up to 13 stages, 50 digits
+        run: python scripts/verify.py --precise --max-stages 13
+      - name: Generated pages are up to date
+        run: |
+          python scripts/render.py
+          python scripts/render_start.py
+          git diff --exit-code
+      - name: Example
+        run: python examples/convergence.py

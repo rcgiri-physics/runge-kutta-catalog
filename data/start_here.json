@@ -1,0 +1,27 @@
+[
+ {
+  "name": "Classical RK4 (Kutta 1901)",
+  "table_id": "0bc63c02af85",
+  "order": 4
+ },
+ {
+  "name": "Dormand-Prince 5(4)",
+  "table_id": "82e10d9ed222",
+  "order": 5
+ },
+ {
+  "name": "Tsitouras 5(4)",
+  "table_id": "22d6d5e09bd8",
+  "order": 5
+ },
+ {
+  "name": "SSPRK(3,3)",
+  "table_id": "c74fd67f41b3",
+  "order": 3
+ },
+ {
+  "name": "Radau IIA, 3 stages",
+  "table_id": "7af97dfa591d",
+  "order": 5
+ }
+]
