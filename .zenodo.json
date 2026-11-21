@@ -8,7 +8,7 @@
   "license": "cc-by-4.0",
   "keywords": ["Runge-Kutta", "Butcher tableau", "Rosenbrock methods", "W-methods", "order conditions", "ODE solvers", "code verification"],
   "related_identifiers": [
-    {"identifier": "10.5281/zenodo.23534512", "relation": "isSupplementedBy", "resource_type": "software"}
+    {"identifier": "10.5281/zenodo.23534512", "relation": "references", "resource_type": "software"}
   ],
   "version": "0.1.0"
 }
