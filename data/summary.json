@@ -1,0 +1,16 @@
+{
+ "tables_read": 847,
+ "libraries": 34,
+ "verdicts_all": {
+  "unlabelled": 16,
+  "PASS": 791,
+  "FAIL": 39,
+  "truncated": 1
+ },
+ "held_back_unconfirmed_defects": 24,
+ "held_back_libraries": 10,
+ "tables_published": 823,
+ "methods_published": 362,
+ "methods_with_first_source": 70,
+ "tables_with_nodepy": 680
+}

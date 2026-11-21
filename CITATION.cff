@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: If you use this dataset, please cite it as below.
+title: "rk-tables: Runge-Kutta tables from open-source ODE libraries, checked against the order conditions and their sources"
+type: dataset
+authors:
+  - family-names: Giri
+    given-names: Ram Chandra
+    orcid: "https://orcid.org/0009-0008-7149-7938"
+version: 0.1.0
+date-released: 2026-11-21
+license: CC-BY-4.0
+repository-code: https://github.com/rcgiri-physics/rk-tables
+abstract: >-
+  823 Butcher tables read from 34 open-source ODE libraries at pinned versions,
+  checked against the order conditions with physverify and to 50 digits, with a
+  NodePy second opinion and comparisons with first published sources, grouped
+  into 362 methods. Includes errata for published sources and confirmed library
+  defects, and a script that re-checks every table.
+keywords:
+  - Runge-Kutta
+  - Butcher tableau
+  - order conditions
+  - ODE solvers
+  - code verification
