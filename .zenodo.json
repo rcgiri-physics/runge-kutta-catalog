@@ -1,0 +1,14 @@
+{
+  "upload_type": "dataset",
+  "title": "runge-kutta-catalog: Runge-Kutta Butcher tableaux with original sources, order checks, and errata",
+  "creators": [
+    {"name": "Giri, Ram Chandra", "orcid": "0009-0008-7149-7938"}
+  ],
+  "description": "<p>823 Butcher tables read from 34 open-source ODE libraries at pinned versions, checked against the order conditions with physverify and to 50 digits, with a NodePy second opinion, and comparisons of 40 methods with their first published sources; and 88 Rosenbrock and W-method tables from 10 libraries, each linked to its source at a pinned commit, with the order for the exact Jacobian, the order as a W-method and the embedded order, and three Rosenbrock methods (ROS3P, RODAS, ROS2) compared with their first published sources. Includes errata for published sources and confirmed library defects, and scripts that re-check every table.</p><p>Counts describe this sample of libraries, chosen by availability; they are not an error rate for numerical software. Defects reported to libraries but not yet confirmed by their maintainers are held back and only counted.</p>",
+  "license": "cc-by-4.0",
+  "keywords": ["Runge-Kutta", "Butcher tableau", "Rosenbrock methods", "W-methods", "order conditions", "ODE solvers", "code verification"],
+  "related_identifiers": [
+    {"identifier": "10.5281/zenodo.23534512", "relation": "isSupplementedBy", "resource_type": "software"}
+  ],
+  "version": "0.1.0"
+}
