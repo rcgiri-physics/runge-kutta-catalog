@@ -106,8 +106,11 @@ def rodas():
     A[5][4] = M(1)
     for k, v in c.items():
         C[int(k[0]) - 1][int(k[1]) - 1] = F(v)
-    m = A[4][:4] + [M(1), M(1)]    # stiffly accurate: the solution is stage 6
-    mh = A[4][:4] + [M(1), M(0)]   # the embedded solution is stage 5
+    # rodas.f (Assimulo copy, lines 743-767): the stage-5 state is y + sum_{j<=4} a5j U_j; the embedded solution adds
+    # the fifth increment, y-hat = y + sum_{j<=4} a5j U_j + U5 (which is also the stage-6 state); the solution adds the
+    # sixth, y1 = y-hat + U6
+    m = A[4][:4] + [M(1), M(1)]    # y1:    weights (a51, ..., a54, 1, 1)
+    mh = A[4][:4] + [M(1), M(0)]   # y-hat: weights (a51, ..., a54, 1, 0)
     alpha, gamma, b, emb = standard_from_transformed(g, A, C, m, mh)
     times = [mpmath.fsum(r) for r in alpha]
     tweights = [mpmath.fsum(r) for r in gamma]
@@ -118,10 +121,14 @@ def rodas():
                      "www.unige.ch/~hairer/prog/stiff/rodas.f, 2026-03-17](https://web.archive.org/web/20260317131158/"
                      "https://www.unige.ch/~hairer/prog/stiff/rodas.f)); the method is described in E. Hairer and G. "
                      "Wanner, *Solving Ordinary Differential Equations II*, 2nd ed. (Springer, 1996), Sects. IV.7 and VI.3 (as the code's header says)",
-        "how": "The 16-digit coefficients of ROCOE METH = 1 (transformed form with gamma = 0.25; the method is stiffly "
-               "accurate, so b is row 6 of A and the embedded weights row 5), converted to the standard form in "
-               "50-digit arithmetic. ROCOE in the archived author's file is identical, line for line, to the copy "
-               "shipped with Assimulo.",
+        "how": "The 16-digit coefficients of ROCOE METH = 1 (transformed form with gamma = 0.25), converted to the "
+               "standard form in 50-digit arithmetic. The weights follow the code ([lines 743-767 of the pinned "
+               "Assimulo copy](https://github.com/modelon-community/Assimulo/blob/74045c69fab4132ea4ebdbff9d9d29268999e3ed/"
+               "thirdparty/hairer/rodas_decsol.f#L743-L767)): the stage-5 state is y + sum_{j<=4} a5j U_j; the embedded "
+               "solution adds the fifth increment, y-hat = y + sum_{j<=4} a5j U_j + U5, which is also the stage-6 state, "
+               "so a6j = (a51, ..., a54, 1); the solution adds the sixth increment, y1 = y-hat + U6. In transformed "
+               "weights: m = (a51, ..., a54, 1, 1) and m-hat = (a51, ..., a54, 1, 0). ROCOE in the archived author's "
+               "file is identical, line for line, to the copy shipped with Assimulo.",
         "alpha": alpha, "gamma": gamma, "b": b, "embedded": emb, "times": times_printed, "time_weights": d_printed,
         "printed_check": float(check),
         "check_label": "the file's own stage times (C2, C3, C4) and time-derivative weights (D1 to D4) against the row "
@@ -161,6 +168,17 @@ def ros2():
 
 SOURCES = [ros3p(), rodas(), ros2()]
 
+# Copies each card must find (table ids in data/rosenbrock.jsonl). A listed copy that is missing, or that differs from
+# its source by more than the tolerance, fails the check; coefficient matching can still find new copies.
+EXPECTED = {
+    "ROS3P": ["f919cbf07df3", "950fa5c3b186", "eb6cb4525555", "4462b47a872c"],
+    "RODAS (Hairer and Wanner)": ["b6ae1e6b748f", "4c4151c782aa", "0ce105291beb", "c5cdca6e97c3", "2691a58613e3",
+                                  "164e42bddac9", "a01e120918d4"],
+    "ROS2": ["9593211b9a19", "486be3a24632", "c54f41404761", "6d5ac59341dc", "c128908c1b71", "25cb190bba4e",
+             "0244f96f9d07", "e8dc7fc424ee"],
+}
+TOL = 1e-12
+
 
 def diff(t, src):
     """Largest absolute difference between a library copy and the source, over alpha, gamma and b (and the embedded
@@ -186,22 +204,38 @@ def comparisons():
             if t["stages"] != len(src["b"]):
                 continue
             d, de = diff(t, src)
-            if d < 1e-8:  # a copy of this method (same coefficients to 1e-8), whatever the library calls it
-                copies.append({"library": t["library"], "method": t["method"], "url": t["source"]["url"],
-                               "diff": d, "embedded_diff": de})
+            # a copy: same coefficients to 1e-8 whatever the library calls it, or a copy the card expects
+            if d < 1e-8 or t["id"] in EXPECTED.get(src["name"], []):
+                copies.append({"id": t["id"], "library": t["library"], "method": t["method"],
+                               "url": t["source"]["url"], "diff": d, "embedded_diff": de})
         out.append((src, copies))
     return out
 
 
-if __name__ == "__main__":
-    import sys
+def problems():
+    """Everything that should fail the check, as plain sentences."""
+    rows = {json.loads(l)["id"] for l in open(ROOT / "data/rosenbrock.jsonl", encoding="utf-8")}
     bad = []
     for src, copies in comparisons():
         if src["printed_check"] > 1e-14:
-            bad.append(f"{src['name']}: the check of the transcription fails")
+            bad.append(f"{src['name']}: the check of the transcription fails ({src['printed_check']:.1e})")
+        found = {c["id"] for c in copies}
+        for tid in EXPECTED.get(src["name"], []):
+            if tid not in rows:
+                bad.append(f"{src['name']}: expected copy {tid} is not in data/rosenbrock.jsonl")
+            elif tid not in found:
+                bad.append(f"{src['name']}: expected copy {tid} has a different stage count")
         for c in copies:
-            if c["diff"] > 1e-12 or (c["embedded_diff"] or 0) > 1e-12:
-                bad.append(f"{src['name']}: {c['library']} differs from the source")
+            if c["diff"] > TOL or (c["embedded_diff"] or 0) > TOL:
+                bad.append(f"{src['name']}: {c['library']} `{c['method']}` ({c['id']}) differs from the source by "
+                           f"{max(c['diff'], c['embedded_diff'] or 0):.1e}")
+    return bad
+
+
+if __name__ == "__main__":
+    import sys
+    bad = problems()
+    for src, copies in comparisons():
         print(f"{src['name']}: {src['check_label']}: {src['printed_check']:.1e}")
         for c in copies:
             print(f"   {c['library']:<20} {c['method']:<8} main {c['diff']:.1e}   embedded "
